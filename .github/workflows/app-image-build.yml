@@ -32,6 +32,7 @@ jobs:
         with:
           repository: Meron-Gelbard/argocd-deploy
           ref: main
+          path: ./argocd-deploy
 
       - name: Make changes
         run: |

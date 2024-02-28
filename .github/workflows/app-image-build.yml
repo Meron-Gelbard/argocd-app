@@ -1,0 +1,50 @@
+name: Weather App Docker image re-build & push
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  Build-Push-Docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/weather-app-gunicorn:latest
+      
+      - name: Checkout manifest Repo
+        uses: actions/checkout@v4
+        with:
+          repository: Meron-Gelbard/argocd-deploy
+          ref: main
+
+      - name: Make changes
+        run: |
+          cd argocd-deploy
+          echo ${GITHUB_RUN_NUMBER} >> test_trigger_file.txt
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git commit -m "${GITHUB_RUN_NUMBER}"
+          git push
+      
+      
+

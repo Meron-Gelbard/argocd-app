@@ -22,7 +22,7 @@ jobs:
         run: |
           echo ${GITHUB_RUN_NUMBER} >> test_trigger_file.txt
 
-      - name: Commit and Push Changes
+      - name: Commit Changes
         working-directory: ./argocd-deploy
         run: |
           git config user.email "merongelbard@gmail.com"
@@ -30,4 +30,11 @@ jobs:
           git remote set-url origin https://${{ secrets.REPO_USER }}:${{ secrets.REPO_PASSW }}@github.com/Meron-Gelbard/argocd-deploy
           git add .
           git commit -m "${GITHUB_RUN_NUMBER}"
-          git push
+
+      - name: Push changes
+        working-directory: ./argocd-deploy
+        env:
+          PAT_TOKEN: ${{ secrets.ARGO_TOKEN }}
+        run: |
+          git push HEAD:main
+        

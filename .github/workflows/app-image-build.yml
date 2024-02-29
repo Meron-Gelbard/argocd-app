@@ -28,8 +28,8 @@ jobs:
           git config user.email "merongelbard@gmail.com"
           git config user.name "Meron-Gelbard"
           git remote set-url origin https://${{ secrets.ARGO_TOKEN }}@github.com/Meron-Gelbard/argocd-deploy
-          git checkout main
           git add .
           git commit -m "${GITHUB_RUN_NUMBER}"
+          pwd
+          ls
           git push
-          

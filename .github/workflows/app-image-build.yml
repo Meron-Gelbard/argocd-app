@@ -41,8 +41,8 @@ jobs:
 
       - name: Commit and Push Changes
         run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
+          git config user.email "merongelbard@gmail.com"
+          git config user.name "Meron-Gelbard"
           git remote set-url origin https://${{ secrets.REPO_USER }}:${{ secrets.REPO_PASSW }}@github.com/Meron-Gelbard/argocd-deploy.git
           git add .
           git commit -m "${GITHUB_RUN_NUMBER}"

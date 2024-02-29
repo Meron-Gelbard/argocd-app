@@ -47,4 +47,4 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Meron-Gelbard/argocd-deploy
           git add .
           git commit -m "${GITHUB_RUN_NUMBER}"
-          git push origin master
+          git push

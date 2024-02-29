@@ -6,6 +6,8 @@ on:
 jobs:
   Build-Push-Docker:
     runs-on: ubuntu-latest
+    permissions: 
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,13 +37,13 @@ jobs:
           path: ./argocd-deploy
 
       - name: Make changes
+        working-directory: ./argocd-deploy
         run: |
-          cd argocd-deploy
           echo ${GITHUB_RUN_NUMBER} >> test_trigger_file.txt
 
       - name: Commit and Push Changes
+        working-directory: ./argocd-deploy
         run: |
-          cd argocd-deploy
           git config user.email "merongelbard@gmail.com"
           git config user.name "Meron-Gelbard"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Meron-Gelbard/argocd-deploy

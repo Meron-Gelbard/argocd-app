@@ -28,7 +28,7 @@ jobs:
           git config user.email "merongelbard@gmail.com"
           git config user.name "Meron-Gelbard"
           git remote add deploy-repo https://${{ secrets.ARGO_TOKEN }}@github.com/Meron-Gelbard/argocd-deploy
-          git checkout master
+          git checkout -b master
           git add .
           git commit -m "${GITHUB_RUN_NUMBER}"
 
@@ -37,6 +37,6 @@ jobs:
         env:
           PAT_TOKEN: ${{ secrets.ARGO_TOKEN }}
         run: |
-          git push deploy-repo master
+          git push deploy-repo HEAD:master
         
 

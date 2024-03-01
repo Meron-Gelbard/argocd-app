@@ -18,6 +18,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Run version script & update in S3
+        id: versioning
         run: |
           aws s3 cp s3://weather-app-version/.app_version ./.app_version
           NEW_VERSION=$(bash app_version_inc.sh minor)
@@ -42,7 +43,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/weather-app-gunicorn:$NEW_VERSION
+          tags: ${{ secrets.DOCKER_USERNAME }}/weather-app-gunicorn:${{steps.versioning.outputs.NEW_VERSION}}
       
   Update-Deploy-Repo:
     needs: Build-Push-Docker
@@ -66,6 +67,7 @@ jobs:
           name: app_version_file
 
       - name: Update Image Version
+        id: version_update
         working-directory: ./argocd-deploy
         run: |
           NEW_VERSION=$(cat ../.app_version)
@@ -78,7 +80,7 @@ jobs:
           git config user.email "merongelbard@gmail.com"
           git config user.name "Meron-Gelbard"
           git add .
-          git commit -m "Deployment update to version: ${NEW_VERSION}"
+          git commit -m "Deployment update to version: ${{steps.version_update.outputs.NEW_VERSION}}"
 
       - name: Push changes
         working-directory: ./argocd-deploy

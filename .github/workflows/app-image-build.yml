@@ -48,16 +48,12 @@ jobs:
       
     
   Update-Deploy-Repo:
+    needs: Build-Push-Docker
     runs-on: ubuntu-latest
     permissions: 
       contents: write
     
     steps:
-      - name: Make changes
-        working-directory: ./argocd-deploy
-        run: |
-          echo ${GITHUB_RUN_NUMBER} >> test_trigger_file.txt
-
       - name: Checkout manifest Repo
         uses: actions/checkout@v4
         with:
@@ -66,6 +62,11 @@ jobs:
           path: ./argocd-deploy
           persist-credentials: true
           token: ${{secrets.ARGO_TOKEN}}
+
+      - name: Make changes
+        working-directory: ./argocd-deploy
+        run: |
+          echo ${GITHUB_RUN_NUMBER} >> test_trigger_file.txt
 
       - name: Commit Changes
         working-directory: ./argocd-deploy

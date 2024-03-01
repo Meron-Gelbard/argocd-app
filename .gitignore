@@ -11,6 +11,7 @@
 !*.yml
 !requirements.txt
 !.gitignore
+!*.sh
 
 .idea
 .DS_Store

@@ -62,14 +62,13 @@ jobs:
       
       - name: Download version file artifact
         uses: actions/download-artifact@v4
-        working-directory: ./argocd-deploy
         with:
           name: app_version_file
 
       - name: Update Image Version
         working-directory: ./argocd-deploy
         run: |
-          NEW_VERSION=$(cat .app_version)
+          NEW_VERSION=$(cat ../.app_version)
           echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           bash update_image_version.sh $NEW_VERSION
 

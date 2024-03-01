@@ -1,4 +1,4 @@
-name: Weather-App - Rebuild Image & Update Deployment Repo
+name: Weather-App - Rebuild Image & Update Deployment Manifest Repo
 on:
   push:
     branches: [ "master" ]
@@ -10,33 +10,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      
-      # - name: Configure AWS CLI
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y awscli
-
-      - name: Configure AWS credentials
+      - name: Run version script & update in S3
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Run version script & update in S3
         run: |
           aws s3 cp s3://weather-app-version/.app_version ./.app_version
-          NEW_VERSION=$(bash app_version_inc.sh patch)
+          NEW_VERSION=$(bash app_version_inc.sh minor)
           echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           aws s3 cp ./.app_version s3://weather-app-version/.app_version
+      
+      - name: Upload Version to github Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app_version_file
+          path: .app_version
 
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -44,9 +40,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/weather-app-gunicorn:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/weather-app-gunicorn:$NEW_VERSION
       
-    
   Update-Deploy-Repo:
     needs: Build-Push-Docker
     runs-on: ubuntu-latest
@@ -62,11 +57,19 @@ jobs:
           path: ./argocd-deploy
           persist-credentials: true
           token: ${{secrets.ARGO_TOKEN}}
+      
+      - name: Download version file artifact
+        working-directory: ./argocd-deploy
+        uses: actions/download-artifact@v4
+        with:
+          name: app_version_file
 
-      - name: Make changes
+      - name: Update Image Version
         working-directory: ./argocd-deploy
         run: |
-          echo ${GITHUB_RUN_NUMBER} >> test_trigger_file.txt
+          NEW_VERSION=$(cat .app_version)
+          echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          bash update_image_version.sh $NEW_VERSION
 
       - name: Commit Changes
         working-directory: ./argocd-deploy
@@ -74,7 +77,7 @@ jobs:
           git config user.email "merongelbard@gmail.com"
           git config user.name "Meron-Gelbard"
           git add .
-          git commit -m "${GITHUB_RUN_NUMBER}"
+          git commit -m "Deployment update to version: ${NEW_VERSION}"
 
       - name: Push changes
         working-directory: ./argocd-deploy

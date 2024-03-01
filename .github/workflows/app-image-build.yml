@@ -43,7 +43,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: 
+          tags: |
             ${{ secrets.DOCKER_USERNAME }}/weather-app-gunicorn:${{steps.versioning.outputs.NEW_VERSION}}
             ${{ secrets.DOCKER_USERNAME }}/weather-app-gunicorn:latest
 

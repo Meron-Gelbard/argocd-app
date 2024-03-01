@@ -61,8 +61,8 @@ jobs:
           token: ${{secrets.ARGO_TOKEN}}
       
       - name: Download version file artifact
-        working-directory: ./argocd-deploy
         uses: actions/download-artifact@v4
+        working-directory: ./argocd-deploy
         with:
           name: app_version_file
 

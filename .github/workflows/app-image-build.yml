@@ -16,6 +16,8 @@ jobs:
           repository: Meron-Gelbard/argocd-deploy
           ref: main
           path: ./argocd-deploy
+          persist-credentials: true
+          token: ${{secrets.ARGO_TOKEN}}
 
       - name: Make changes
         working-directory: ./argocd-deploy
@@ -27,16 +29,12 @@ jobs:
         run: |
           git config user.email "merongelbard@gmail.com"
           git config user.name "Meron-Gelbard"
-          git checkout -b master
           git add .
           git commit -m "${GITHUB_RUN_NUMBER}"
 
       - name: Push changes
         working-directory: ./argocd-deploy
-        env:
-          PAT_TOKEN: ${{ secrets.ARGO_TOKEN }}
         run: |
-          git remote add deploy-repo https://x-access-token:${{ secrets.ARGO_TOKEN }}@github.com/Meron-Gelbard/argocd-deploy.git
-          git push deploy-repo HEAD:master
+          git push
         
 

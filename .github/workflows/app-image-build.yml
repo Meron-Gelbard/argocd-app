@@ -47,7 +47,7 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/weather-app-gunicorn:latest
       
     
-  Update Deploy Repo:
+  Update-Deploy-Repo:
     runs-on: ubuntu-latest
     permissions: 
       contents: write

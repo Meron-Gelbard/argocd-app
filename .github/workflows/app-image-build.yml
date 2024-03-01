@@ -36,7 +36,6 @@ jobs:
         env:
           PAT_TOKEN: ${{ secrets.ARGO_TOKEN }}
         run: |
-          git push deploy-repo HEAD:main
+          git push deploy-repo master
         
 
-        

@@ -30,10 +30,10 @@ jobs:
 
       - name: Run version script & update in S3
         run: |
-          aws s3 cp s3://weather-app-version/.app_version
+          aws s3 cp s3://weather-app-version/.app_version ./.app_version
           NEW_VERSION=$(bash app_version_inc.sh patch)
           echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_OUTPUT"
-          aws s3 cp .app_version s3://weather-app-version/.app_version
+          aws s3 cp ./.app_version s3://weather-app-version/.app_version
 
       # - name: Set up Docker Buildx
       #   uses: docker/setup-buildx-action@v3

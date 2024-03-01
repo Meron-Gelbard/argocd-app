@@ -36,7 +36,7 @@ jobs:
         env:
           PAT_TOKEN: ${{ secrets.ARGO_TOKEN }}
         run: |
-          git remote add deploy-repo https://x-access-token:${{ secrets.ARGO_TOKEN }}@github.com/Meron-Gelbard/argocd-deploy
+          git remote add deploy-repo https://x-access-token:${{ secrets.ARGO_TOKEN }}@github.com/Meron-Gelbard/argocd-deploy.git
           git push deploy-repo HEAD:master
         
 
